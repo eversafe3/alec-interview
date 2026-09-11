@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alec Interview - Chick-fil-A</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #f5f5f5;
+      padding: 1rem;
+    }
+    #root { max-width: 680px; margin: 0 auto; }
+    .container { 
+      background: white; 
+      border-radius: 12px; 
+      border: 1px solid #e0e0e0; 
+      padding: 2rem; 
+      margin-bottom: 1rem;
+    }
+    h1 { font-size: 24px; font-weight: 500; margin-bottom: 1rem; }
+    h2 { font-size: 16px; font-weight: 500; margin-bottom: 1rem; line-height: 1.5; }
+    p { font-size: 14px; color: #666; margin-bottom: 1rem; }
+    input, textarea { 
+      width: 100%; 
+      padding: 0.75rem; 
+      border: 1px solid #e0e0e0; 
+      border-radius: 8px; 
+      font-size: 14px; 
+      font-family: inherit;
+      margin-bottom: 1rem;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    button { 
+      padding: 0.75rem 1rem; 
+      border: none; 
+      border-radius: 8px; 
+      font-size: 14px; 
+      font-weight: 500; 
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary { 
+      background: #1976d2; 
+      color: white; 
+      flex: 1;
+    }
+    .btn-primary:hover { background: #1565c0; }
+    .btn-secondary { 
+      background: #f5f5f5; 
+      color: #333; 
+      border: 1px solid #e0e0e0;
+    }
+    .btn-secondary:hover { background: #efefef; }
+    .btn-group { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .progress { 
+      background: #f5f5f5; 
+      padding: 0.75rem 1rem; 
+      border-left: 3px solid #1976d2; 
+      border-radius: 4px; 
+      margin-bottom: 1.5rem;
+    }
+    .chat-area { 
+      background: #f9f9f9; 
+      border-radius: 8px; 
+      padding: 1rem; 
+      margin-bottom: 1.5rem; 
+      min-height: 100px; 
+      max-height: 300px; 
+      overflow-y: auto; 
+      border: 1px solid #e0e0e0;
+    }
+    .answer-box { 
+      margin-bottom: 0.75rem; 
+      padding: 0.75rem; 
+      background: white; 
+      border-radius: 6px; 
+      border-left: 2px solid #1976d2;
+      font-size: 13px;
+    }
+    .answer-box strong { color: #666; font-size: 12px; }
+    .answer-box p { margin: 0.5rem 0 0 0; font-size: 14px; color: #333; }
+    .hidden { display: none; }
+    .spinner { 
+      width: 40px; 
+      height: 40px; 
+      border: 3px solid #1976d2; 
+      border-top-color: transparent; 
+      border-radius: 50%; 
+      animation: spin 1s linear infinite;
+      margin: 1rem auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .score-card { 
+      background: #f9f9f9; 
+      padding: 1.5rem; 
+      border-radius: 8px; 
+      margin-bottom: 1.5rem; 
+      border-left: 4px solid #1976d2;
+    }
+    .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .score-metric { }
+    .score-metric strong { font-size: 12px; color: #999; display: block; margin-bottom: 0.5rem; }
+    .score-metric .value { font-size: 32px; font-weight: 500; color: #1976d2; }
+    .score-breakdown { display: grid; gap: 0.75rem; }
+    .score-item { 
+      padding: 1rem; 
+      background: white; 
+      border-radius: 6px; 
+      border-left: 3px solid #1976d2;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .score-item .label { font-size: 13px; }
+    .score-item .label strong { display: block; font-size: 13px; margin-bottom: 0.25rem; }
+    .score-item .score { font-size: 18px; font-weight: 500; min-width: 50px; text-align: right; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    const COMPETENCIES = [
+      "Customer Service & Hospitality",
+      "Teamwork & Communication",
+      "Food Safety & Quality Standards",
+      "Handling Pressure & Work Ethic",
+      "Integrity & Accountability",
+      "Following Systems & Procedures",
+      "Reliability & Growth Mindset"
+    ];
+
+    const QUESTIONS = [
+      {
+        main: "Tell me about a time you had to serve a customer who was upset or frustrated. What did you do and what was the outcome?",
+        followUp: "What would you do differently if you faced that situation again?",
+        competency: COMPETENCIES[0]
+      },
+      {
+        main: "Describe your experience working as part of a team. How do you handle it when a coworker isn't pulling their weight?",
+        followUp: "Can you give me a specific example of when you had to depend on teammates to get the job done?",
+        competency: COMPETENCIES[1]
+      },
+      {
+        main: "Food safety and cleanliness are critical in food service. Walk me through how you would maintain these standards during a busy shift.",
+        followUp: "What would you do if you saw another team member cut corners on food safety?",
+        competency: COMPETENCIES[2]
+      },
+      {
+        main: "Tell me about a time when you had to balance speed with quality. How did you manage competing priorities?",
+        followUp: "How would you handle it if a supervisor asked you to move faster when you felt it would compromise quality?",
+        competency: COMPETENCIES[3]
+      },
+      {
+        main: "Describe a situation where you made a mistake at work. How did you handle it, and what did you learn?",
+        followUp: "If that same situation happened again today, what would you do?",
+        competency: COMPETENCIES[4]
+      },
+      {
+        main: "Chick-fil-A has specific systems and procedures for everything from taking orders to food prep. How do you feel about following detailed procedures?",
+        followUp: "Tell me about a time you had to learn and follow a new process or system. How did you approach it?",
+        competency: COMPETENCIES[5]
+      },
+      {
+        main: "Why do you want to work at Chick-fil-A, and what do you hope to get out of this job?",
+        followUp: "Where do you see yourself in a year if you work here?",
+        competency: COMPETENCIES[6]
+      }
+    ];
+
+    let state = {
+      phase: "name-input",
+      candidateName: "",
+      currentQuestion: 0,
+      isFollowUp: false,
+      answers: [],
+      scores: [],
+      hireDate: new Date().toISOString().split('T')[0],
+      currentAnswer: "",
+      finalScore: null,
+      finalRank: null,
+      isScoring: false,
+      scoringProgress: ""
+    };
+
+    // Check for URL parameter pre-fill
+    const params = new URLSearchParams(window.location.search);
+    const urlCandidateName = params.get("name");
+    if (urlCandidateName) {
+      state.candidateName = decodeURIComponent(urlCandidateName);
+      state.phase = "interview";
+    }
+
+    function render() {
+      const root = document.getElementById('root');
+      
+      if (state.phase === "name-input") {
+        root.innerHTML = renderNameInput();
+      } else if (state.phase === "interview") {
+        root.innerHTML = renderInterview();
+      } else if (state.phase === "scoring") {
+        root.innerHTML = renderScoring();
+      } else if (state.phase === "results") {
+        root.innerHTML = renderResults();
+      }
+    }
+
+    function renderNameInput() {
+      return `
+        <div class="container" style="text-align: center;">
+          <h1>Alec Interview System</h1>
+          <p style="margin-bottom: 2rem;">AI-Powered Phone Interviewer for Chick-fil-A</p>
+          
+          <label style="display: block; text-align: left; margin-bottom: 0.5rem; font-weight: 500;">Candidate Name</label>
+          <input type="text" id="candidate-name" placeholder="Enter candidate's full name" />
+
+          <button class="btn-primary" onclick="startInterview()">Start Interview</button>
+        </div>
+      `;
+    }
+
+    function renderInterview() {
+      const q = state.currentQuestion;
+      const question = QUESTIONS[q];
+      const currentQuestion = state.isFollowUp ? question.followUp : question.main;
+
+      return `
+        <div class="container">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h1 style="margin: 0;">Alec Interview</h1>
+            <span style="font-size: 14px; color: #999; background: #f5f5f5; padding: 0.5rem 1rem; border-radius: 8px;">Q${q + 1}/7</span>
+          </div>
+
+          <p style="margin-bottom: 0.5rem; font-size: 12px;">Candidate: <strong>${state.candidateName}</strong></p>
+          
+          <div class="progress">
+            <strong style="color: #999; font-size: 12px;">COMPETENCY: ${question.competency}</strong>
+          </div>
+
+          <h2>${state.isFollowUp ? '↳ Follow-up: ' : ''}${currentQuestion}</h2>
+
+          <div class="chat-area">
+            ${state.answers.map((a, i) => {
+              const qNum = Math.floor(i / 2) + 1;
+              const isFollowUp = i % 2 === 1;
+              return `
+                <div class="answer-box">
+                  <strong>Q${qNum}${isFollowUp ? ' (follow-up)' : ''}</strong>
+                  <p>${a}</p>
+                </div>
+              `;
+            }).join('')}
+            <div style="margin-top: 1rem; padding: 0.75rem; background: #e3f2fd; border-radius: 6px; font-size: 14px; color: #1976d2; min-height: 20px; line-height: 1.4;" id="current-input">
+              Click the microphone to record your answer...
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn-primary" onclick="toggleListening()" style="flex: 1;">
+              <span id="mic-icon">🎤</span> <span id="mic-text">Record Answer</span>
+            </button>
+            <button class="btn-secondary" onclick="toggleTextInput()">Type Instead</button>
+          </div>
+
+          <div id="text-input-container" class="hidden">
+            <textarea id="text-answer" placeholder="Type your answer here..."></textarea>
+          </div>
+
+          <div class="btn-group">
+            ${q > 0 || state.isFollowUp ? `<button class="btn-secondary" onclick="goBack()">← Back</button>` : ''}
+            <button class="btn-primary" onclick="nextQuestion()">
+              ${state.isFollowUp ? 'Next Question →' : 'Ask Follow-up'}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderScoring() {
+      return `
+        <div class="container" style="text-align: center;">
+          <h1>Evaluating Interview...</h1>
+          <p>Alec is scoring each answer. This may take 30-60 seconds.</p>
+          <div class="spinner"></div>
+          <p id="scoring-progress" style="font-size: 13px; color: #999;">Starting evaluation...</p>
+        </div>
+      `;
+    }
+
+    function renderResults() {
+      const score = state.finalScore;
+      let scoreColor = "#d32f2f";
+      if (score >= 7) scoreColor = "#1976d2";
+      if (score >= 4 && score < 7) scoreColor = "#f57c00";
+
+      return `
+        <div class="container">
+          <h1>Interview Complete</h1>
+          
+          <div class="score-card" style="border-left-color: ${scoreColor};">
+            <div class="score-grid">
+              <div class="score-metric">
+                <strong>CANDIDATE</strong>
+                <div class="value" style="font-size: 18px; color: #333;">${state.candidateName}</div>
+              </div>
+              <div class="score-metric">
+                <strong>DATE</strong>
+                <div class="value" style="font-size: 18px; color: #333;">${state.hireDate}</div>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid #e0e0e0; padding-top: 1rem;">
+              <div class="score-grid">
+                <div class="score-metric">
+                  <strong>FINAL SCORE</strong>
+                  <div class="value" style="color: ${scoreColor};">${score.toFixed(1)}/9</div>
+                </div>
+                <div class="score-metric">
+                  <strong>RECOMMENDATION</strong>
+                  <div class="value" style="font-size: 20px; color: ${scoreColor};">${state.finalRank}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h2 style="margin-top: 2rem;">Individual Scores by Competency</h2>
+          <div class="score-breakdown">
+            ${state.scores.map((score, i) => {
+              const q = QUESTIONS[i];
+              let scoreColor = "#d32f2f";
+              if (score >= 7) scoreColor = "#1976d2";
+              if (score >= 4 && score < 7) scoreColor = "#f57c00";
+              
+              return `
+                <div class="score-item" style="border-left-color: ${scoreColor};">
+                  <div class="label">
+                    <strong>Q${i + 1}: ${q.competency}</strong>
+                  </div>
+                  <div class="score" style="color: ${scoreColor};">${score.toFixed(1)}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="btn-group" style="margin-top: 2rem;">
+            <button class="btn-primary" onclick="downloadPDF()">📥 Download PDF Scorecard</button>
+            <button class="btn-secondary" onclick="restartInterview()">↻ New Interview</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function startInterview() {
+      const name = document.getElementById('candidate-name').value.trim();
+      if (!name) {
+        alert('Please enter the candidate\'s name.');
+        return;
+      }
+      state.candidateName = name;
+      state.phase = "interview";
+      render();
+    }
+
+    function toggleListening() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Speech recognition not supported in your browser. Please use Chrome, Safari, or Edge.');
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      document.getElementById('mic-text').textContent = 'Listening...';
+      document.getElementById('mic-icon').textContent = '🔴';
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript + ' ';
+        }
+        state.currentAnswer = transcript.trim();
+        document.getElementById('current-input').textContent = state.currentAnswer;
+      };
+
+      recognition.onerror = () => {
+        alert('Error listening. Please try again.');
+        document.getElementById('mic-text').textContent = 'Record Answer';
+        document.getElementById('mic-icon').textContent = '🎤';
+      };
+
+      recognition.onend = () => {
+        document.getElementById('mic-text').textContent = 'Record Answer';
+        document.getElementById('mic-icon').textContent = '🎤';
+      };
+
+      recognition.start();
+    }
+
+    function toggleTextInput() {
+      const container = document.getElementById('text-input-container');
+      if (container.classList.contains('hidden')) {
+        container.classList.remove('hidden');
+        document.getElementById('text-answer').focus();
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    function nextQuestion() {
+      let answer = state.currentAnswer || document.getElementById('text-answer').value;
+      
+      if (!answer.trim()) {
+        alert('Please provide an answer before continuing.');
+        return;
+      }
+
+      state.answers.push(answer);
+
+      if (!state.isFollowUp) {
+        state.isFollowUp = true;
+        state.currentAnswer = "";
+        document.getElementById('text-input-container').classList.add('hidden');
+        document.getElementById('text-answer').value = '';
+      } else {
+        state.currentQuestion++;
+        state.isFollowUp = false;
+        state.currentAnswer = "";
+        document.getElementById('text-input-container').classList.add('hidden');
+        document.getElementById('text-answer').value = '';
+
+        if (state.currentQuestion >= QUESTIONS.length) {
+          state.phase = "scoring";
+          render();
+          scoreAllAnswers();
+        }
+      }
+
+      render();
+    }
+
+    function goBack() {
+      if (state.isFollowUp) {
+        state.isFollowUp = false;
+        state.answers.pop();
+      } else if (state.currentQuestion > 0) {
+        state.currentQuestion--;
+        state.isFollowUp = true;
+        state.answers.pop();
+      }
+      render();
+    }
+
+    async function scoreAllAnswers() {
+      state.scores = [];
+      
+      for (let i = 0; i < QUESTIONS.length; i++) {
+        const q = QUESTIONS[i];
+        const mainAnswer = state.answers[i * 2];
+        const followUpAnswer = state.answers[i * 2 + 1];
+
+        document.getElementById('scoring-progress').textContent = `Evaluating Q${i + 1}: ${q.competency}...`;
+
+        const score = await scoreQuestion(i, mainAnswer, followUpAnswer, q);
+        state.scores.push(score);
+      }
+
+      const avgScore = state.scores.reduce((a, b) => a + b, 0) / state.scores.length;
+      
+      if (avgScore >= 1 && avgScore < 4) {
+        state.finalRank = "Do Not Hire";
+      } else if (avgScore >= 4 && avgScore < 7) {
+        state.finalRank = "Consider Employee";
+      } else if (avgScore >= 7 && avgScore < 8) {
+        state.finalRank = "C Employee";
+      } else if (avgScore >= 8 && avgScore < 9) {
+        state.finalRank = "B Employee";
+      } else {
+        state.finalRank = "A Employee";
+      }
+
+      state.finalScore = avgScore;
+
+      // Send results to email endpoint
+      await sendResultsToEmail();
+
+      state.phase = "results";
+      render();
+    }
+
+    async function scoreQuestion(questionIndex, mainAnswer, followUpAnswer, question) {
+      const prompt = `You are an expert Chick-fil-A hiring manager evaluating interview responses for FOH/BOH positions.
+
+Competency: ${question.competency}
+
+Main Question: "${question.main}"
+Candidate's Answer: "${mainAnswer}"
+
+Follow-up Question: "${question.followUp}"
+Candidate's Follow-up Answer: "${followUpAnswer}"
+
+Score this response on a scale of 1-9:
+1-3: Do Not Hire - Major concerns or significant gaps
+4-6: Consider - Meets minimum standards, trainable
+7: C Employee - Good performer, reliable
+8: B Employee - Strong performer, leader potential
+9: A Employee - Exceptional, top-tier
+
+Evaluate: specific examples, hospitality mindset, food safety, accountability, coachability, communication.
+
+Respond ONLY with valid JSON (no markdown):
+{"score": NUMBER}`;
+
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 100,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+
+        if (!response.ok) {
+          console.error('API Error:', response.statusText);
+          return 5;
+        }
+
+        const data = await response.json();
+        const text = data.content[0].text.trim();
+        const json = JSON.parse(text);
+        return Math.max(1, Math.min(9, json.score));
+      } catch (err) {
+        console.error('Scoring error:', err);
+        return 5;
+      }
+    }
+
+    async function sendResultsToEmail() {
+      const payload = {
+        candidateName: state.candidateName,
+        finalScore: state.finalScore,
+        finalRank: state.finalRank,
+        scores: state.scores,
+        answers: state.answers,
+        hireDate: state.hireDate
+      };
+
+      try {
+        await fetch('/api/send-interview-results', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.error('Error sending results:', err);
+      }
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let yPos = 20;
+
+      const avgScore = state.finalScore;
+      const rank = state.finalRank;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.text('Chick-fil-A Candidate Interview Scorecard', pageWidth / 2, yPos, { align: 'center' });
+
+      yPos += 12;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.text(`Candidate: ${state.candidateName}`, 20, yPos);
+      yPos += 6;
+      doc.text(`Date: ${state.hireDate}`, 20, yPos);
+
+      yPos += 14;
+      doc.setFillColor(0, 0, 0);
+      doc.rect(20, yPos - 5, pageWidth - 40, 18, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text(`FINAL SCORE: ${avgScore.toFixed(1)}/9`, 20, yPos + 3);
+      doc.setFontSize(11);
+      doc.text(`RECOMMENDATION: ${rank}`, 20, yPos + 10);
+
+      doc.setTextColor(0, 0, 0);
+      yPos += 24;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Question-by-Question Scores:', 20, yPos);
+      yPos += 8;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+
+      QUESTIONS.forEach((q, i) => {
+        const score = state.scores[i];
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Q${i + 1}: ${q.competency} — ${score.toFixed(1)}/9`, 20, yPos);
+        yPos += 6;
+
+        const mainText = `Main: "${state.answers[i * 2]}"`;
+        const mainLines = doc.splitTextToSize(mainText, pageWidth - 40);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text(mainLines, 20, yPos);
+        yPos += mainLines.length * 4 + 2;
+
+        const followText = `Follow-up: "${state.answers[i * 2 + 1]}"`;
+        const followLines = doc.splitTextToSize(followText, pageWidth - 40);
+        doc.text(followLines, 20, yPos);
+        yPos += followLines.length * 4 + 4;
+
+        if (yPos > pageHeight - 20) {
+          doc.addPage();
+          yPos = 20;
+        }
+      });
+
+      doc.save(`Alec_Interview_${state.hireDate}_${state.candidateName.replace(/\s+/g, '_')}.pdf`);
+    }
+
+    function restartInterview() {
+      state = {
+        phase: "name-input",
+        candidateName: "",
+        currentQuestion: 0,
+        isFollowUp: false,
+        answers: [],
+        scores: [],
+        hireDate: new Date().toISOString().split('T')[0],
+        currentAnswer: "",
+        finalScore: null,
+        finalRank: null,
+        isScoring: false,
+        scoringProgress: ""
+      };
+      render();
+    }
+
+    render();
+  </script>
+</body>
+</html>
