@@ -2,8 +2,6 @@
 // Scores main interview answers 1-9 using the Claude API.
 // The API key lives in Vercel env vars (ANTHROPIC_API_KEY) and never reaches the browser.
 
-const MODEL = process.env.ALEC_MODEL || 'claude-sonnet-5';
-
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -23,7 +21,11 @@ export default async function handler(req, res) {
         ? 'The candidate answered in Spanish. Evaluate the answers in Spanish; do not penalize language choice.'
         : 'The candidate answered in English.';
 
-    const prompt = `You are an expert hiring manager for Chick-fil-A. Score the candidate's responses on a scale of 1-9 for each question.
+    const allAnswers = answers.map((a, i) =>
+        `Q${i + 1}\nMain answer: ${a.main}\nFollow-up answer: ${a.followUp}`
+    ).join('\n\n');
+
+    const prompt = `You are an expert hiring manager for Chick-fil-A. Score the candidate responses on a scale of 1-9 for each question.
 
 Scoring guide:
 1-3: Do Not Hire (significant gaps in competency)
@@ -38,7 +40,7 @@ Candidate Path: ${path === 'yes' ? 'Previous Work Experience' : 'First Job / Hig
 ${langNote}
 
 Responses:
-${answers.map((a, i) => `Q${i + 1}\nMain answer: ${a.main}\nFollow-up answer: ${a.followUp}`).join('\n\n')}
+${allAnswers}
 
 Return ONLY a JSON array of exactly ${count} integer scores, one per question, in order. Example: [7, 8, 6, 7, 8, 6, 7]. No other text.`;
 
@@ -51,35 +53,38 @@ Return ONLY a JSON array of exactly ${count} integer scores, one per question, i
                 'anthropic-version': '2023-06-01'
             },
             body: JSON.stringify({
-                model: MODEL,
+                model: 'claude-sonnet-5',
                 max_tokens: 300,
                 messages: [{ role: 'user', content: prompt }]
             })
         });
 
         const data = await response.json();
+
         if (!response.ok) {
-            console.error('Claude API error:', data);
+            console.error('Claude API error:', JSON.stringify(data));
             return res.status(502).json({ error: 'Scoring service error', details: data.error?.message || 'unknown' });
         }
 
-        const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
-        const match = text.match(/\[[^\]]*\]/);
-        if (!match) throw new Error('No JSON array in model output: ' + text);
+        const text = (data.content || [])
+            .filter(b => b.type === 'text')
+            .map(b => b.text)
+            .join('')
+            .trim();
+
+        const match = text.match(/\[[\d,\s]+\]/);
+        if (!match) {
+            console.error('No JSON array in model output:', text);
+            throw new Error('Unexpected model output format');
+        }
 
         let scores = JSON.parse(match[0]);
-        if (!Array.isArray(scores) || scores.length !== count) {
-            throw new Error(`Expected ${count} scores, got ${JSON.stringify(scores)}`);
-        }
-        scores = scores.map(s => {
-            const n = Math.round(Number(s));
-            if (!Number.isFinite(n)) throw new Error('Non-numeric score: ' + s);
-            return Math.min(9, Math.max(1, n));
-        });
+        scores = scores.map(s => Math.min(9, Math.max(1, Math.round(Number(s)))));
 
-        return res.status(200).json({ scores, model: MODEL });
+        return res.status(200).json({ scores });
+
     } catch (error) {
-        console.error('Scoring error:', error);
+        console.error('Scoring error:', error.message);
         return res.status(500).json({ error: 'Failed to score interview', details: error.message });
     }
 }
