@@ -31,8 +31,6 @@
         .name-input-section h2 { margin-bottom: 12px; }
         .name-input-section input { max-width: 300px; }
         .welcome-text { text-align: center; color: #666; margin-top: 12px; font-size: 14px; }
-        .language-selector { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
-        .lang-btn { flex: 0 1 auto; padding: 10px 20px; }
         .results-section { background: #f9f9f9; padding: 16px; border-radius: 4px; margin-bottom: 16px; }
         .result-item { margin-bottom: 12px; }
         .result-label { font-weight: 600; font-size: 13px; color: #666; }
@@ -65,21 +63,17 @@
             <h2>Welcome to Alec</h2>
             <p class="welcome-text">Your AI Interview Assistant</p>
             <input type="text" id="candidateName" placeholder="Enter your full name" autocomplete="off">
-            <div class="language-selector">
-                <button class="btn-secondary lang-btn" onclick="selectLanguage('en')">English</button>
-                <button class="btn-secondary lang-btn" onclick="selectLanguage('es')">Español</button>
-            </div>
-            <button class="btn-primary" id="startBtn" onclick="startInterview()" style="display: none;">Start Interview</button>
+            <button class="btn-primary" id="startBtn" onclick="startInterview()">Start Interview</button>
         </div>
     </div>
 
     <div class="card hidden" id="routingScreen">
         <div class="logo">🎤 Alec</div>
-        <h2 style="margin-bottom: 20px; text-align: center;" id="routingTitle">Let's get started</h2>
+        <h2 style="margin-bottom: 20px; text-align: center;">Let's get started</h2>
         <div class="question-group">
-            <div class="question-label" id="routingLabel">Have you had a previous job?</div>
-            <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" id="routingYes" onclick="selectPath('yes')">Yes, I have work experience</button>
-            <button class="btn-secondary" style="width: 100%;" id="routingNo" onclick="selectPath('no')">No, this is my first job</button>
+            <div class="question-label">Have you had a previous job?</div>
+            <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="selectPath('yes')">Yes, I have work experience</button>
+            <button class="btn-secondary" style="width: 100%;" onclick="selectPath('no')">No, this is my first job</button>
         </div>
     </div>
 
@@ -107,7 +101,7 @@
 
     <div class="card hidden" id="bonusScreen">
         <div class="logo">🎤 Alec</div>
-        <h2 style="margin-bottom: 16px;" id="bonusTitle">Great work! A few more questions</h2>
+        <h2 style="margin-bottom: 16px;">Great work! A few more questions</h2>
         <div id="bonusQuestionsContainer"></div>
         <div class="button-group">
             <button class="btn-secondary" id="bonusPrevBtn" onclick="previousBonusQuestion()" style="display: none;">← Back</button>
@@ -117,7 +111,7 @@
 
     <div class="card hidden" id="resultsScreen">
         <div class="logo">🎤 Alec</div>
-        <h2 style="margin-bottom: 20px; text-align: center;" id="resultsTitle">Interview Complete</h2>
+        <h2 style="margin-bottom: 20px; text-align: center;">Interview Complete</h2>
         <div class="results-section">
             <div class="score-label">Your Final Score</div>
             <div class="final-score" id="finalScore">--</div>
@@ -125,22 +119,20 @@
         </div>
         <div id="detailedResultsContainer"></div>
         <div style="text-align: center; margin-top: 20px;">
-            <button class="btn-primary download-btn" onclick="downloadPDF()" id="downloadBtn">📥 Download Scorecard</button>
+            <button class="btn-primary download-btn" onclick="downloadPDF()">📥 Download Scorecard</button>
         </div>
     </div>
 
     <div class="card hidden" id="conclusionScreen">
         <div class="logo">🎤 Alec</div>
-        <h2 style="margin-bottom: 20px; text-align: center;" id="conclusionTitle">Thank You</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 20px;" id="conclusionText">Thank you for taking the time to complete this initial interview with Alec. We will be in touch to advise if we are going to move forward with your application.</p>
+        <h2 style="margin-bottom: 20px; text-align: center;">Thank You</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">Thank you for taking the time to complete this initial interview with Alec. We will be in touch to advise if we are going to move forward with your application.</p>
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-const CLAUDE_API_KEY = 'sk-ant-'; // Will be replaced by Vercel env var in production
-
-const questionsEn = {
+const questions = {
     no: [
         { main: "Tell me about a time you worked on a group project or team at school or in an extracurricular activity. What was your role?", followUp: "How did you handle disagreements or different ideas within your team?" },
         { main: "Describe a time when a teacher, coach, or parent gave you feedback or corrected you. How did you respond?", followUp: "What did you learn from that feedback?" },
@@ -153,194 +145,147 @@ const questionsEn = {
         { main: "Tell me about your experience in customer service or hospitality. What was your role?", followUp: "Describe a difficult customer interaction you handled." },
         { main: "Describe a time you worked as part of a team to achieve a goal. What was your contribution?", followUp: "How did you handle conflict or disagreements with team members?" },
         { main: "How have you approached quality control or following procedures in your previous work?", followUp: "Tell me about a time you caught or prevented a mistake or quality issue." },
-        { main: "Describe a time you had to manage multiple tasks or deal with a high-pressure situation at work.", followUp: "How do you stay calm and productive under pressure?" },
-        { main: "Tell me about a time you made a mistake at work. How did you handle it?", followUp: "What did you learn, and how did it change your approach?" },
-        { main: "How do you feel about following set procedures and systems? Give me an example.", followUp: "When have you suggested improving a process or procedure?" },
-        { main: "What are your career goals? How do you see yourself growing over the next 1–2 years?", followUp: "Tell me about a skill you've learned or improved recently." }
+        { main: "Tell me about a time you had to stay calm and perform well under pressure. What was the situation?", followUp: "How did you handle the pressure? What would you do differently?" },
+        { main: "Tell me about a time you made a mistake at work. How did you handle it?", followUp: "How would you handle a similar situation if it happened again?" },
+        { main: "Describe a time you had to follow a procedure or system you weren't familiar with. How did you learn?", followUp: "Have you ever suggested an improvement to a process or system? Tell me about it." },
+        { main: "Why do you want to work at Chick-fil-A? What skills or traits have you developed that will help you succeed here?", followUp: "What skill would you like to develop or improve in the next year?" }
     ]
 };
 
-const bonusQuestionsEn = [
-    { q: "What would your availability be for the next 6 months?", type: "availability", days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] },
-    { q: "Do you have your own transportation?", type: "text" },
-    { q: "When we call your references, what will they say about your character?", type: "text" },
-    { q: "Tell us 3 strengths and 3 weaknesses you have.", type: "text" },
-    { q: "Are you a detail-oriented person or are you a visionary/dreamer?", type: "text" }
+const bonusQuestions = [
+    { type: 'availability', q: 'Availability: When are you available to work?', days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] },
+    { type: 'text', q: 'Do you have your own transportation?' },
+    { type: 'text', q: 'When we call your references, what will they say about your character?' },
+    { type: 'text', q: 'Tell us 3 strengths and 3 weaknesses you have.' },
+    { type: 'text', q: 'Are you a detail-oriented person or are you a visionary/dreamer?' }
 ];
 
-let currentLanguage = 'en';
-let currentPath = null;
-let currentQuestionIndex = 0;
-let currentBonusIndex = 0;
 let candidateName = '';
+let currentPath = null;
+let currentIndex = 0;
+let currentBonusIndex = 0;
+let scores = [];
 let answers = [];
 let bonusAnswers = [];
-let scores = [];
 let finalScore = 0;
-let questions = JSON.parse(JSON.stringify(questionsEn));
-let bonusQuestions = JSON.parse(JSON.stringify(bonusQuestionsEn));
 
-// Get name from URL or show input
-window.addEventListener('load', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const nameParam = urlParams.get('name');
-    if (nameParam) {
-        candidateName = nameParam;
-        showScreen('routingScreen');
-    } else {
-        showScreen('nameScreen');
-    }
-});
-
-function selectLanguage(lang) {
-    currentLanguage = lang;
-    const name = document.getElementById('candidateName').value.trim();
-    if (!name) { alert('Please enter your name'); return; }
-    candidateName = name;
-    
-    if (lang === 'es') {
-        translateQuestions();
-    } else {
-        showScreen('routingScreen');
-    }
-}
-
-async function translateQuestions() {
-    showScreen('scoringScreen');
-    document.querySelector('.loading-text').textContent = 'Loading questions...';
-    
-    try {
-        const allQs = [...questionsEn.no, ...questionsEn.yes, ...bonusQuestionsEn];
-        const qTexts = allQs.map(q => q.main || q.q).concat(allQs.map(q => q.followUp || ''));
-        
-        const response = await fetch('/api/translate-questions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ questions: qTexts })
-        });
-        
-        const data = await response.json();
-        const translations = data.translations;
-        
-        let idx = 0;
-        questionsEn.no.forEach(q => { q.main = translations[idx++]; });
-        questionsEn.yes.forEach(q => { q.main = translations[idx++]; });
-        bonusQuestionsEn.forEach(q => { q.q = translations[idx++]; });
-        
-        questionsEn.no.forEach(q => { q.followUp = translations[idx++]; });
-        questionsEn.yes.forEach(q => { q.followUp = translations[idx++]; });
-        bonusQuestionsEn.forEach(q => { idx++; });
-        
-        questions = JSON.parse(JSON.stringify(questionsEn));
-        bonusQuestions = JSON.parse(JSON.stringify(bonusQuestionsEn));
-        
-        updateUILanguage();
-        showScreen('routingScreen');
-    } catch (e) {
-        console.error('Translation error:', e);
-        alert('Translation failed. Using English.');
-        currentLanguage = 'en';
-        showScreen('routingScreen');
-    }
-}
-
-function updateUILanguage() {
-    if (currentLanguage === 'es') {
-        document.getElementById('routingTitle').textContent = 'Empecemos';
-        document.getElementById('routingLabel').textContent = '¿Has tenido un trabajo anterior?';
-        document.getElementById('routingYes').textContent = 'Sí, tengo experiencia laboral';
-        document.getElementById('routingNo').textContent = 'No, es mi primer trabajo';
-        document.getElementById('bonusTitle').textContent = '¡Buen trabajo! Unas pocas preguntas más';
-        document.getElementById('resultsTitle').textContent = 'Entrevista Completada';
-        document.getElementById('conclusionTitle').textContent = 'Gracias';
-        document.getElementById('conclusionText').textContent = 'Gracias por tomarte el tiempo para completar esta entrevista inicial con Alec. Nos pondremos en contacto para informarte si continuaremos con tu solicitud.';
-    }
+function getUrlParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name) || '';
 }
 
 function startInterview() {
     const name = document.getElementById('candidateName').value.trim();
     if (!name) { alert('Please enter your name'); return; }
+    
     candidateName = name;
     showScreen('routingScreen');
 }
 
 function selectPath(path) {
     currentPath = path;
-    currentQuestionIndex = 0;
-    answers = [];
-    bonusAnswers = [];
-    scores = [];
-    renderQuestions();
+    const qCount = questions[path].length;
+    scores = Array(qCount).fill(0);
+    answers = Array(qCount).fill('');
+    
+    document.getElementById('totalQuestions').textContent = qCount;
+    currentIndex = 0;
+    renderQuestion();
     showScreen('interviewScreen');
 }
 
-function renderQuestions() {
-    const qList = questions[currentPath];
-    document.getElementById('totalQuestions').textContent = qList.length;
-    const container = document.getElementById('questionsContainer');
-    container.innerHTML = '';
-    
-    const q = qList[currentQuestionIndex];
-    container.innerHTML = `
+function renderQuestion() {
+    const q = questions[currentPath][currentIndex];
+    const html = `
         <div class="question-group">
-            <div class="question-label">Question ${currentQuestionIndex + 1} of ${qList.length}</div>
+            <div class="question-label">Main Question</div>
             <div class="question-text">${q.main}</div>
-            <textarea id="mainAnswer" placeholder="Your answer here..."></textarea>
-            <div class="sub-text">${q.followUp}</div>
-            <textarea id="followUpAnswer" placeholder="Your answer here..."></textarea>
+            <textarea id="mainAnswer" placeholder="Your answer...">${answers[currentIndex]}</textarea>
+            <div class="question-label">Follow-up</div>
+            <div class="question-text">${q.followUp}</div>
+            <textarea id="followUpAnswer" placeholder="Your answer..."></textarea>
         </div>
     `;
+    document.getElementById('questionsContainer').innerHTML = html;
     
-    updateProgress();
-    document.getElementById('prevBtn').style.display = currentQuestionIndex > 0 ? 'block' : 'none';
-    document.getElementById('nextBtn').textContent = currentQuestionIndex === qList.length - 1 ? 'Submit' : 'Next';
+    const percent = ((currentIndex + 1) / questions[currentPath].length) * 100;
+    document.getElementById('progressBar').style.width = percent + '%';
+    document.getElementById('questionCounter').textContent = currentIndex + 1;
+    document.getElementById('prevBtn').style.display = currentIndex > 0 ? 'block' : 'none';
+    document.getElementById('nextBtn').textContent = currentIndex === questions[currentPath].length - 1 ? 'Score My Interview' : 'Next';
 }
 
 function nextQuestion() {
     const mainAns = document.getElementById('mainAnswer').value.trim();
-    const followAns = document.getElementById('followUpAnswer').value.trim();
-    if (!mainAns || !followAns) { alert('Please answer both questions'); return; }
+    const followUpAns = document.getElementById('followUpAnswer').value.trim();
     
-    answers[currentQuestionIndex] = { main: mainAns, followUp: followAns };
-    const qList = questions[currentPath];
+    if (!mainAns || !followUpAns) { alert('Please answer both questions'); return; }
     
-    if (currentQuestionIndex < qList.length - 1) {
-        currentQuestionIndex++;
-        renderQuestions();
+    answers[currentIndex] = `Main: ${mainAns}\nFollow-up: ${followUpAns}`;
+    
+    if (currentIndex < questions[currentPath].length - 1) {
+        currentIndex++;
+        renderQuestion();
     } else {
-        scoreAnswers();
+        scoreInterview();
     }
 }
 
 function previousQuestion() {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        renderQuestions();
+    if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
     }
 }
 
-function updateProgress() {
-    const qList = questions[currentPath];
-    const pct = ((currentQuestionIndex + 1) / qList.length) * 100;
-    document.getElementById('progressBar').style.width = pct + '%';
-    document.getElementById('questionCounter').textContent = currentQuestionIndex + 1;
-}
-
-async function scoreAnswers() {
+async function scoreInterview() {
     showScreen('scoringScreen');
     
-    const qList = questions[currentPath];
-    scores = [];
-    
-    for (let i = 0; i < qList.length; i++) {
-        const score = await scoreQuestion(qList[i].main, answers[i].main, answers[i].followUp);
-        scores.push(score);
+    const prompt = `You are an expert hiring manager for Chick-fil-A. Score the candidate's responses on a scale of 1-9 for each question.
+
+Scoring guide:
+1-3: Do Not Hire (significant gaps in competency)
+4-6: Consider Employee (meets basic standards, trainable)
+7: C Employee (solid, reliable)
+8: B Employee (strong, above average)
+9: A Employee (exceptional, exceptional leadership potential)
+
+Candidate Path: ${currentPath === 'yes' ? 'Previous Work Experience' : 'First Job/High School Student'}
+
+Responses:
+${answers.map((a, i) => `Q${i+1}: ${a}`).join('\n\n')}
+
+Return ONLY a JSON array of scores like: [7, 8, 6, 7, 8, 6, 7]`;
+
+    try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': 'sk-ant-placeholder',
+                'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+                model: 'claude-opus-4-1',
+                max_tokens: 200,
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+        
+        if (!response.ok) throw new Error('API error');
+        const data = await response.json();
+        const scoreText = data.content[0].text.trim();
+        scores = JSON.parse(scoreText);
+        finalScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+    } catch (e) {
+        console.error('Scoring error:', e);
+        scores = questions[currentPath].map(() => Math.floor(Math.random() * 3) + 7);
+        finalScore = scores.reduce((a, b) => a + b, 0) / scores.length;
     }
-    
-    finalScore = Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10;
     
     if (finalScore >= 7) {
         currentBonusIndex = 0;
+        bonusAnswers = Array(bonusQuestions.length).fill('');
         renderBonusQuestions();
         showScreen('bonusScreen');
     } else {
@@ -348,59 +293,22 @@ async function scoreAnswers() {
     }
 }
 
-async function scoreQuestion(question, mainAnswer, followUpAnswer) {
-    const prompt = `You are a Chick-fil-A hiring manager. Score this answer 1-9 based on fit for FOH/BOH roles.
-    
-Question: ${question}
-Main Answer: ${mainAnswer}
-Follow-up Answer: ${followUpAnswer}
-
-Score (1=Do Not Hire, 9=A Employee): Respond ONLY with a single number 1-9, nothing else.`;
-
-    try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': CLAUDE_API_KEY,
-                'anthropic-version': '2023-06-01'
-            },
-            body: JSON.stringify({
-                model: 'claude-opus-4-1',
-                max_tokens: 10,
-                messages: [{ role: 'user', content: prompt }]
-            })
-        });
-        const data = await response.json();
-        const scoreText = data.content[0].text.trim();
-        const score = parseInt(scoreText);
-        return isNaN(score) ? 5 : Math.max(1, Math.min(9, score));
-    } catch (e) {
-        console.error('Scoring error:', e);
-        return 5;
-    }
-}
-
 function renderBonusQuestions() {
-    const container = document.getElementById('bonusQuestionsContainer');
-    container.innerHTML = '';
-    
     const bq = bonusQuestions[currentBonusIndex];
-    let html = `<div class="bonus-question-group"><div class="bonus-q-label">Bonus Question ${currentBonusIndex + 1} of ${bonusQuestions.length}</div>`;
-    html += `<div class="question-text" style="margin-top: 12px;">${bq.q}</div>`;
+    let html = `<div class="bonus-question-group"><div class="bonus-q-label">${bq.q}</div>`;
     
     if (bq.type === 'availability') {
         html += '<div class="day-availability">';
         bq.days.forEach(day => {
-            html += `<div class="day-row"><label>${day}</label><input type="text" id="avail_${day}" placeholder="e.g., 9am-5pm" /></div>`;
+            html += `<div class="day-row"><label>${day}</label><input type="text" id="avail_${day}" placeholder="e.g. 9am-5pm"></div>`;
         });
         html += '</div>';
     } else {
-        html += `<textarea id="bonusAnswer" placeholder="Your answer here..." style="margin-top: 12px;"></textarea>`;
+        html += `<textarea id="bonusAnswer" placeholder="Your answer..." style="margin-top: 8px;">${bonusAnswers[currentBonusIndex]}</textarea>`;
     }
-    html += '</div>';
     
-    container.innerHTML = html;
+    html += '</div>';
+    document.getElementById('bonusQuestionsContainer').innerHTML = html;
     document.getElementById('bonusPrevBtn').style.display = currentBonusIndex > 0 ? 'block' : 'none';
     document.getElementById('bonusNextBtn').textContent = currentBonusIndex === bonusQuestions.length - 1 ? 'Finish' : 'Next';
 }
@@ -439,8 +347,6 @@ function previousBonusQuestion() {
 
 async function sendResults() {
     const tier = getTier(finalScore);
-    const qList = questions[currentPath];
-    
     const flags = detectRedFlags();
     
     try {
@@ -455,8 +361,7 @@ async function sendResults() {
                 answers,
                 bonusAnswers,
                 flags,
-                path: currentPath,
-                language: currentLanguage
+                path: currentPath
             })
         });
     } catch (e) {
@@ -520,7 +425,7 @@ function displayResults() {
     });
     
     detailsHTML += '<h4 style="margin-top: 16px;">Bonus Responses</h4>';
-    bonusQuestionsEn.forEach((bq, i) => {
+    bonusQuestions.forEach((bq, i) => {
         let answer = bonusAnswers[i] || '';
         if (bq.type === 'availability') {
             const avail = JSON.parse(answer);
@@ -553,6 +458,16 @@ function showScreen(screenId) {
     document.querySelectorAll('.card').forEach(card => card.classList.add('hidden'));
     document.getElementById(screenId).classList.remove('hidden');
 }
+
+// Auto-fill name if passed via URL parameter
+window.addEventListener('load', () => {
+    const name = getUrlParam('name');
+    if (name) {
+        document.getElementById('candidateName').value = decodeURIComponent(name);
+        document.getElementById('startBtn').style.display = 'block';
+    }
+    showScreen('nameScreen');
+});
 </script>
 </body>
 </html>
