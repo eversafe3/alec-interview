@@ -2,18 +2,118 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+async function translateAnswers(answers, language) {
+    if (language === 'en') return answers;
+    
+    const allAnswers = answers.flatMap(a => [a.main, a.followUp]);
+    
+    const prompt = `Translate these Spanish interview answers to English. Return ONLY the translations as a JSON array in the exact same order. Do not include explanations.
+
+Answers:
+${allAnswers.map((a, i) => `${i}: ${a}`).join('\n')}
+
+Respond ONLY with valid JSON array, nothing else.`;
+
+    try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.ANTHROPIC_API_KEY,
+                'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+                model: 'claude-opus-4-1',
+                max_tokens: 2000,
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+        
+        const data = await response.json();
+        const translations = JSON.parse(data.content[0].text.trim());
+        
+        const translatedAnswers = [];
+        let idx = 0;
+        answers.forEach(a => {
+            translatedAnswers.push({
+                main: translations[idx++],
+                followUp: translations[idx++]
+            });
+        });
+        
+        return translatedAnswers;
+    } catch (e) {
+        console.error('Translation error:', e);
+        return answers;
+    }
+}
+
+async function translateBonusAnswers(bonusAnswers, bonusQuestionsCount, language) {
+    if (language === 'en') return bonusAnswers;
+    
+    const answersToTranslate = bonusAnswers.filter(a => typeof a === 'string' && a !== 'Not provided' && !a.startsWith('{'));
+    if (answersToTranslate.length === 0) return bonusAnswers;
+    
+    const prompt = `Translate these Spanish interview answers to English. Return ONLY the translations as a JSON array in the exact same order. Do not include explanations.
+
+Answers:
+${answersToTranslate.map((a, i) => `${i}: ${a}`).join('\n')}
+
+Respond ONLY with valid JSON array, nothing else.`;
+
+    try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.ANTHROPIC_API_KEY,
+                'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+                model: 'claude-opus-4-1',
+                max_tokens: 1000,
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+        
+        const data = await response.json();
+        const translations = JSON.parse(data.content[0].text.trim());
+        
+        const translatedBonus = [];
+        let idx = 0;
+        bonusAnswers.forEach((a, i) => {
+            if (typeof a === 'string' && a !== 'Not provided' && !a.startsWith('{')) {
+                translatedBonus.push(translations[idx++]);
+            } else {
+                translatedBonus.push(a);
+            }
+        });
+        
+        return translatedBonus;
+    } catch (e) {
+        console.error('Bonus translation error:', e);
+        return bonusAnswers;
+    }
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { candidateName, finalScore, tier, scores, answers, bonusAnswers, flags, path, resultsHTML } = req.body;
+    let { candidateName, finalScore, tier, scores, answers, bonusAnswers, flags, path, language } = req.body;
 
     if (!candidateName || finalScore === undefined) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     try {
+        // Translate answers if Spanish
+        if (language === 'es') {
+            answers = await translateAnswers(answers, language);
+            bonusAnswers = await translateBonusAnswers(bonusAnswers, 5, language);
+        }
+
         const pathLabel = path === 'yes' ? 'Work Experience' : 'No Experience';
         const questionsCount = path === 'yes' ? 7 : 6;
         
