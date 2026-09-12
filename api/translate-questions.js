@@ -4,6 +4,11 @@ export default async function handler(req, res) {
     }
 
     const { questions } = req.body;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+
+    if (!apiKey) {
+        return res.status(500).json({ error: 'ANTHROPIC_API_KEY not set' });
+    }
 
     try {
         const prompt = `Translate these interview questions to Spanish. Return ONLY the translations as a JSON array in the exact same order. Do not include explanations.
@@ -17,7 +22,7 @@ Respond ONLY with valid JSON array, nothing else.`;
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': process.env.ANTHROPIC_API_KEY,
+                'x-api-key': apiKey,
                 'anthropic-version': '2023-06-01'
             },
             body: JSON.stringify({
@@ -28,11 +33,22 @@ Respond ONLY with valid JSON array, nothing else.`;
         });
         
         const data = await response.json();
+        
+        if (!response.ok) {
+            console.error('Claude API error:', data);
+            return res.status(500).json({ error: 'Translation API failed', details: data });
+        }
+
+        if (!data.content || !data.content[0]) {
+            console.error('Unexpected API response:', data);
+            return res.status(500).json({ error: 'Unexpected API response' });
+        }
+
         const translations = JSON.parse(data.content[0].text.trim());
 
         return res.status(200).json({ translations });
     } catch (error) {
         console.error('Translation error:', error);
-        return res.status(500).json({ error: 'Translation failed' });
+        return res.status(500).json({ error: 'Translation failed', details: error.message });
     }
 }
