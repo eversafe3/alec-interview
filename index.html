@@ -164,7 +164,7 @@ const UI = {
         thankYou: 'Thank You',
         conclusionText: 'Thank you for taking the time to complete this initial interview with Alec. We will be in touch to advise if we are going to move forward with your application.',
         alertName: 'Please enter your name', alertBoth: 'Please answer both questions', alertAnswer: 'Please answer',
-        tiers: { dnh: 'Do Not Hire', consider: 'Consider Employee', c: 'C Employee', b: 'B Employee', a: 'A Employee' },
+        tiers: { c: 'C Candidate', b: 'B Candidate', a: 'A Candidate' },
         days: { Monday: 'Monday', Tuesday: 'Tuesday', Wednesday: 'Wednesday', Thursday: 'Thursday', Friday: 'Friday', Saturday: 'Saturday' }
     },
     es: {
@@ -182,7 +182,7 @@ const UI = {
         thankYou: 'Gracias',
         conclusionText: 'Gracias por tomarte el tiempo de completar esta entrevista inicial con Alec. Nos pondremos en contacto contigo para informarte si seguiremos adelante con tu solicitud.',
         alertName: 'Por favor escribe tu nombre', alertBoth: 'Por favor responde ambas preguntas', alertAnswer: 'Por favor responde',
-        tiers: { dnh: 'No contratar', consider: 'Candidato a considerar', c: 'Empleado nivel C', b: 'Empleado nivel B', a: 'Empleado nivel A' },
+        tiers: { c: 'Candidato nivel C', b: 'Candidato nivel B', a: 'Candidato nivel A' },
         days: { Monday: 'Lunes', Tuesday: 'Martes', Wednesday: 'Miércoles', Thursday: 'Jueves', Friday: 'Viernes', Saturday: 'Sábado' }
     }
 };
@@ -377,7 +377,7 @@ async function scoreInterview() {
         return;
     }
 
-    if (finalScore >= 7) {
+    if (finalScore >= 4) {
         currentBonusIndex = 0;
         bonusAnswers = Array(BQ().length).fill('');
         renderBonusQuestions();
@@ -429,7 +429,7 @@ async function nextBonusQuestion() {
         renderBonusQuestions();
     } else {
         await sendResults();
-        displayResults();
+        showScreen('conclusionScreen');
     }
 }
 
@@ -524,12 +524,10 @@ function displayResults() {
     showScreen('resultsScreen');
 }
 
-// Tier boundaries follow the rubric: 1–3.99 Do Not Hire, 4–6.99 Consider, 7–7.99 C, 8–8.99 B, 9 A.
+// Tier boundaries: 1-3.99 = C (no bonus), 4-6.99 = B, 7-9 = A. B and A get bonus questions.
 function getTierKey(score) {
-    if (score < 4) return 'dnh';
-    if (score < 7) return 'consider';
-    if (score < 8) return 'c';
-    if (score < 9) return 'b';
+    if (score < 4) return 'c';
+    if (score < 7) return 'b';
     return 'a';
 }
 
