@@ -237,14 +237,20 @@ const bonusQuestions = {
         { type: 'text', q: 'Do you have your own transportation?' },
         { type: 'text', q: 'When we call your references, what will they say about your character?' },
         { type: 'text', q: 'Tell us 3 strengths and 3 weaknesses you have.' },
-        { type: 'text', q: 'Are you a detail-oriented person or are you a visionary/dreamer?' }
+        { type: 'text', q: 'Are you a detail-oriented person or are you a visionary/dreamer?' },
+        { type: 'text', q: 'This job requires lifting up to 50 lbs, standing for long periods, cleaning (including restrooms), climbing a ladder, and working closely with others in tight spaces. Are you able to perform these essential job functions, with or without reasonable accommodation?' },
+        { type: 'text', q: 'Do you know anyone who works at our restaurant? If so, who?' },
+        { type: 'text', q: 'When we contact your previous employer or references, what will they say about your attendance and reliability?' }
     ],
     es: [
         { type: 'availability', q: 'Disponibilidad: ¿Cuándo puedes trabajar?' },
         { type: 'text', q: '¿Tienes tu propio medio de transporte?' },
         { type: 'text', q: 'Cuando llamemos a tus referencias, ¿qué dirán sobre tu carácter?' },
         { type: 'text', q: 'Dinos 3 fortalezas y 3 debilidades que tengas.' },
-        { type: 'text', q: '¿Eres una persona detallista o eres más visionario/soñador?' }
+        { type: 'text', q: '¿Eres una persona detallista o eres más visionario/soñador?' },
+        { type: 'text', q: 'Este trabajo requiere levantar hasta 50 libras (23 kg), estar de pie por períodos largos, limpiar (incluyendo baños), subir escaleras y trabajar cerca de otras personas en espacios reducidos. ¿Puedes realizar estas funciones esenciales del trabajo, con o sin una adaptación razonable?' },
+        { type: 'text', q: '¿Conoces a alguien que trabaje en nuestro restaurante? Si es así, ¿a quién?' },
+        { type: 'text', q: 'Cuando contactemos a tu empleador anterior o a tus referencias, ¿qué dirán sobre tu asistencia y confiabilidad?' }
     ]
 };
 
@@ -480,6 +486,16 @@ function detectRedFlags() {
         // whole-word "no" / "don't" in English, "no tengo" / "no cuento" in Spanish
         if (/\bno\b/.test(a) || /\bdon'?t\b/.test(a) || /\bno tengo\b/.test(a) || /\bno cuento\b/.test(a)) {
             flags.push({ category: 'Transportation', text: 'No personal transportation' });
+        }
+    }
+    if (bonusAnswers[5]) {
+        const a = bonusAnswers[5].toLowerCase().trim();
+        const negEn = /\b(cannot|can't|unable|not able)\b/.test(a);
+        const negEs = /\bno puedo\b/.test(a);
+        const bareNo = a === 'no' || a === 'no.';
+        const softOk = /\bno (problem|issue|issues|concerns?)\b/.test(a);
+        if ((negEn || negEs || bareNo) && !softOk) {
+            flags.push({ category: 'Physical Requirements', text: 'May be unable to perform essential job functions' });
         }
     }
     if (bonusAnswers[2]) {
