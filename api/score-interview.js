@@ -26,12 +26,14 @@ module.exports = async function handler(req, res) {
         return 'Q' + (i + 1) + '\nMain answer: ' + a.main + '\nFollow-up answer: ' + a.followUp;
     }).join('\n\n');
 
-    const prompt = 'You are an expert hiring manager for Chick-fil-A. Score the candidate responses on a scale of 1-9 for each question.\n\n'
+    const prompt = 'You are a hiring manager screening candidates for entry-level hourly positions at Chick-fil-A. Score each response 1-9.\n\n'
+        + 'IMPORTANT CONTEXT: Many candidates are teenagers or first-time job seekers typing on a phone. Score for POTENTIAL and ATTITUDE, not polish. Be generous and give the benefit of the doubt.\n\n'
         + 'Scoring guide:\n'
-        + '1-3: C Candidate (significant gaps, weak or vague answers)\n'
-        + '4-6: B Candidate (meets basic standards, trainable, solid potential)\n'
-        + '7-9: A Candidate (strong to exceptional, clear competency and reflection)\n\n'
-        + 'Evaluate: clarity, demonstration of competency, self-awareness, ability to learn, alignment with Chick-fil-A values.\n\n'
+        + '1-3: C Candidate. Reserve this range for genuinely concerning answers only: blank or nonsense responses, hostility, dishonesty, or clear red flags about work ethic or character. An answer that is merely short or unimpressive is NOT a 1-3.\n'
+        + '4-6: B Candidate. The default range. Any reasonable, on-topic answer showing willingness to work, basic teamwork, and a positive attitude belongs here.\n'
+        + '7-9: A Candidate. A specific example, evidence of reflection or learning, ownership of a mistake, or genuine enthusiasm for service. One good concrete detail is enough to earn a 7.\n\n'
+        + 'Do NOT deduct points for: brief answers, simple vocabulary, spelling or grammar errors, typos, limited work history, or youth. These are expected and are not job-relevant.\n'
+        + 'When an answer could reasonably fall into two ranges, choose the HIGHER score.\n\n'
         + 'Candidate Path: ' + (path === 'yes' ? 'Previous Work Experience' : 'First Job / High School Student') + '\n'
         + langNote + '\n\n'
         + 'Responses:\n' + allAnswers + '\n\n'
