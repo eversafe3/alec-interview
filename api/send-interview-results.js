@@ -139,7 +139,10 @@ module.exports = async function handler(req, res) {
             { q: 'Transportation', type: 'text' },
             { q: 'Character Reference', type: 'text' },
             { q: 'Strengths & Weaknesses', type: 'text' },
-            { q: 'Detail-Oriented vs Visionary', type: 'text' }
+            { q: 'Detail-Oriented vs Visionary', type: 'text' },
+            { q: 'Physical Requirements', type: 'text' },
+            { q: 'Knows Someone at CFA', type: 'text' },
+            { q: 'Attendance & Reliability', type: 'text' }
         ];
 
         const hasBonus = bonusAnswers && bonusAnswers.length > 0 && bonusAnswers.some(function(a) { return a; });
