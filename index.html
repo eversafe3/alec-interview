@@ -77,6 +77,17 @@
         </div>
     </div>
 
+    <div class="card hidden" id="roleScreen">
+        <div class="logo">🎤 Alec</div>
+        <h2 style="margin-bottom: 16px; text-align: center;" data-i18n="roleTitle">Which position are you applying for?</h2>
+        <div class="question-group">
+            <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="selectRole('foh')" data-i18n="roleFoh">Front of House - Counter, Drive-Thru, Dining Room</button>
+            <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="selectRole('boh')" data-i18n="roleBoh">Back of House - Kitchen, Food Preparation</button>
+            <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="selectRole('driver')" data-i18n="roleDriver">Driver - Delivery</button>
+            <button class="btn-secondary" style="width: 100%;" onclick="selectRole('lead')" data-i18n="roleLead">Leadership - Team Leader or Manager</button>
+        </div>
+    </div>
+
     <div class="card hidden" id="routingScreen">
         <div class="logo">🎤 Alec</div>
         <h2 style="margin-bottom: 20px; text-align: center;" data-i18n="routingTitle">Let's get started</h2>
@@ -153,6 +164,7 @@ const UI = {
         welcomeTitle: 'Welcome to Alec', welcomeSub: 'Your AI Interview Assistant', namePlaceholder: 'Enter your full name',
         langHint: 'Choose your language / Elige tu idioma', startBtn: 'Start Interview',
         routingTitle: "Let's get started", routingQ: 'Have you had a previous job?',
+        roleTitle: 'Which position are you applying for?', roleFoh: 'Front of House - Counter, Drive-Thru, Dining Room', roleBoh: 'Back of House - Kitchen, Food Preparation', roleDriver: 'Driver - Delivery', roleLead: 'Leadership - Team Leader or Manager',
         routingYes: 'Yes, I have work experience', routingNo: 'No, this is my first job',
         of: 'of', back: '← Back', next: 'Next', scoreBtn: 'Score My Interview', finish: 'Finish',
         mainQ: 'Main Question', followUp: 'Follow-up', answerPlaceholder: 'Your answer...',
@@ -171,6 +183,7 @@ const UI = {
         welcomeTitle: 'Bienvenido a Alec', welcomeSub: 'Tu asistente de entrevista con IA', namePlaceholder: 'Escribe tu nombre completo',
         langHint: 'Choose your language / Elige tu idioma', startBtn: 'Comenzar entrevista',
         routingTitle: 'Comencemos', routingQ: '¿Has tenido un trabajo anteriormente?',
+        roleTitle: '¿Para qué puesto estás aplicando?', roleFoh: 'Atención al Cliente - Mostrador, Auto-servicio, Comedor', roleBoh: 'Cocina - Preparación de Alimentos', roleDriver: 'Conductor - Entregas', roleLead: 'Liderazgo - Líder de Equipo o Gerente',
         routingYes: 'Sí, tengo experiencia laboral', routingNo: 'No, este es mi primer trabajo',
         of: 'de', back: '← Atrás', next: 'Siguiente', scoreBtn: 'Calificar mi entrevista', finish: 'Terminar',
         mainQ: 'Pregunta principal', followUp: 'Pregunta de seguimiento', answerPlaceholder: 'Tu respuesta...',
@@ -190,43 +203,157 @@ const UI = {
 // ---------- Interview questions in both languages ----------
 const questions = {
     en: {
-        no: [
-            { main: "Tell me about a time you worked on a group project or team at school or in an extracurricular activity. What was your role?", followUp: "How did you handle disagreements or different ideas within your team?" },
-            { main: "Describe a time when a teacher, coach, or parent gave you feedback or corrected you. How did you respond?", followUp: "What did you learn from that feedback?" },
-            { main: "Tell me about a challenge or conflict you faced at school. How did you solve it?", followUp: "Would you handle it differently now?" },
-            { main: "Tell me about a time you asked for help or had to negotiate something with a peer, teacher, or adult.", followUp: "How did you approach the conversation?" },
-            { main: "Tell me about a time you made a mistake at school or with friends. What did you do?", followUp: "Would you handle it the same way again?" },
-            { main: "What interests you about working at Chick-fil-A? What do you hope to learn or achieve this year?", followUp: "How will you stay motivated if the work gets repetitive?" }
-        ],
-        yes: [
-            { main: "Tell me about your experience in customer service or hospitality. What was your role?", followUp: "Describe a difficult customer interaction you handled." },
-            { main: "Describe a time you worked as part of a team to achieve a goal. What was your contribution?", followUp: "How did you handle conflict or disagreements with team members?" },
-            { main: "How have you approached quality control or following procedures in your previous work?", followUp: "Tell me about a time you caught or prevented a mistake or quality issue." },
-            { main: "Tell me about a time you had to stay calm and perform well under pressure. What was the situation?", followUp: "How did you handle the pressure? What would you do differently?" },
-            { main: "Tell me about a time you made a mistake at work. How did you handle it?", followUp: "How would you handle a similar situation if it happened again?" },
-            { main: "Describe a time you had to follow a procedure or system you weren't familiar with. How did you learn?", followUp: "Have you ever suggested an improvement to a process or system? Tell me about it." },
-            { main: "Why do you want to work at Chick-fil-A? What skills or traits have you developed that will help you succeed here?", followUp: "What skill would you like to develop or improve in the next year?" }
+        foh: {
+            no: [
+                { main: "Tell me about a time you worked on a group project or team at school or in an extracurricular activity. What was your role?", followUp: "How did you handle disagreements or different ideas within your team?" },
+                { main: "Describe a time when a teacher, coach, or parent gave you feedback or corrected you. How did you respond?", followUp: "What did you learn from that feedback?" },
+                { main: "Tell me about a challenge or conflict you faced at school. How did you solve it?", followUp: "Would you handle it differently now?" },
+                { main: "Tell me about a time you asked for help or had to negotiate something with a peer, teacher, or adult.", followUp: "How did you approach the conversation?" },
+                { main: "Tell me about a time you made a mistake at school or with friends. What did you do?", followUp: "Would you handle it the same way again?" },
+                { main: "What interests you about working at Chick-fil-A? What do you hope to learn or achieve this year?", followUp: "How will you stay motivated if the work gets repetitive?" }
+            ],
+            yes: [
+                { main: "Tell me about your experience in customer service or hospitality. What was your role?", followUp: "Describe a difficult customer interaction you handled." },
+                { main: "Describe a time you worked as part of a team to achieve a goal. What was your contribution?", followUp: "How did you handle conflict or disagreements with team members?" },
+                { main: "How have you approached quality control or following procedures in your previous work?", followUp: "Tell me about a time you caught or prevented a mistake or quality issue." },
+                { main: "Tell me about a time you had to stay calm and perform well under pressure. What was the situation?", followUp: "How did you handle the pressure? What would you do differently?" },
+                { main: "Tell me about a time you made a mistake at work. How did you handle it?", followUp: "How would you handle a similar situation if it happened again?" },
+                { main: "Describe a time you had to follow a procedure or system you weren't familiar with. How did you learn?", followUp: "Have you ever suggested an improvement to a process or system? Tell me about it." },
+                { main: "Why do you want to work at Chick-fil-A? What skills or traits have you developed that will help you succeed here?", followUp: "What skill would you like to develop or improve in the next year?" }
+            ]
+        },
+        boh: {
+            no: [
+                { main: "Tell me about a time you worked on a group project or team at school or in an extracurricular activity. What was your role?", followUp: "How did you handle disagreements or different ideas within your team?" },
+                { main: "Describe a time when a teacher, coach, or parent gave you feedback or corrected you. How did you respond?", followUp: "What did you learn from that feedback?" },
+                { main: "Tell me about a challenge or conflict you faced at school. How did you solve it?", followUp: "Would you handle it differently now?" },
+                { main: "Kitchen work means doing the same task carefully many times - breading chicken exactly the same way on the hundredth piece as the first. Tell me about a time you had to do something repetitive and still do it well.", followUp: "How did you keep from getting careless or bored?" },
+                { main: "Tell me about a time you made a mistake at school or with friends. What did you do?", followUp: "Would you handle it the same way again?" },
+                { main: "What interests you about working at Chick-fil-A? What do you hope to learn or achieve this year?", followUp: "How will you stay motivated if the work gets repetitive?" }
+            ],
+            yes: [
+                { main: "At Chick-fil-A we take great pride in the cleanliness of our kitchens and the safety of our food. How important is cleanliness to you, and why?", followUp: "Tell me about a time you noticed something that wasn't clean or wasn't right. What did you do about it?" },
+                { main: "Describe a time you worked as part of a team to achieve a goal. What was your contribution?", followUp: "How did you handle conflict or disagreements with team members?" },
+                { main: "How have you approached quality control or following procedures in your previous work?", followUp: "Tell me about a time you caught or prevented a mistake or quality issue." },
+                { main: "Kitchen work means long stretches on your feet in a hot, loud, fast-moving space. Tell me about a time you had to keep working hard in difficult or uncomfortable conditions.", followUp: "How did you stay focused? What kept you going?" },
+                { main: "Tell me about a time you made a mistake at work. How did you handle it?", followUp: "How would you handle a similar situation if it happened again?" },
+                { main: "Describe a time you had to follow a procedure or system you weren't familiar with. How did you learn?", followUp: "Have you ever suggested an improvement to a process or system? Tell me about it." },
+                { main: "Why do you want to work at Chick-fil-A? What skills or traits have you developed that will help you succeed here?", followUp: "What skill would you like to develop or improve in the next year?" }
+            ]
+        },
+        driver: {
+            no: [
+                { main: "Tell me about a time you worked on a group project or team at school or in an extracurricular activity. What was your role?", followUp: "How did you handle disagreements or different ideas within your team?" },
+                { main: "Describe a time when a teacher, coach, or parent gave you feedback or corrected you. How did you respond?", followUp: "What did you learn from that feedback?" },
+                { main: "Tell me about a challenge or conflict you faced at school. How did you solve it?", followUp: "Would you handle it differently now?" },
+                { main: "Tell me about a time you were running late or under time pressure while driving. What did you do?", followUp: "How do you balance being on time with driving safely?" },
+                { main: "Tell me about a time you made a mistake at school or with friends. What did you do?", followUp: "Would you handle it the same way again?" },
+                { main: "What interests you about working at Chick-fil-A? What do you hope to learn or achieve this year?", followUp: "How will you stay motivated if the work gets repetitive?" }
+            ],
+            yes: [
+                { main: "Tell me about your experience in customer service or hospitality. What was your role?", followUp: "Describe a difficult customer interaction you handled." },
+                { main: "Describe a time you worked as part of a team to achieve a goal. What was your contribution?", followUp: "How did you handle conflict or disagreements with team members?" },
+                { main: "Delivering food means getting the order right and keeping it at the correct temperature from the kitchen to the customer's door. Tell me about a time you were responsible for getting details exactly right.", followUp: "What did you do to double-check your work?" },
+                { main: "Tell me about a time you were running late or under time pressure while driving. What did you do?", followUp: "How do you balance being on time with driving safely?" },
+                { main: "Tell me about a time you made a mistake at work. How did you handle it?", followUp: "How would you handle a similar situation if it happened again?" },
+                { main: "Describe a time you had to follow a procedure or system you weren't familiar with. How did you learn?", followUp: "Have you ever suggested an improvement to a process or system? Tell me about it." },
+                { main: "Why do you want to work at Chick-fil-A? What skills or traits have you developed that will help you succeed here?", followUp: "What skill would you like to develop or improve in the next year?" }
+            ]
+        },
+        lead: [
+            { main: "What is the difference between a leader and a manager? Which one are you?", followUp: "Give me an example of a time you were one and not the other." },
+            { main: "Describe your leadership style.", followUp: "Tell me about someone you led who did not respond well to that style. What did you do?" },
+            { main: "Tell me about a time you failed at something important.", followUp: "What did you change afterward?" },
+            { main: "Tell me about a time you had to lead a team. What was your biggest success factor?", followUp: "What would you do differently next time?" },
+            { main: "Tell me about your experience training and coaching others.", followUp: "How do you know when someone has actually learned it?" },
+            { main: "What would you do if you caught a coworker stealing?", followUp: "Have you ever had to report someone? What happened?" },
+            { main: "Where do you want your career to be in two to three years?", followUp: "What are you doing now to get there?" }
         ]
     },
     es: {
-        no: [
-            { main: "Cuéntame sobre una ocasión en la que trabajaste en un proyecto en grupo o en un equipo en la escuela o en una actividad extracurricular. ¿Cuál fue tu rol?", followUp: "¿Cómo manejaste los desacuerdos o las ideas diferentes dentro de tu equipo?" },
-            { main: "Describe una ocasión en la que un maestro, entrenador o padre te dio retroalimentación o te corrigió. ¿Cómo respondiste?", followUp: "¿Qué aprendiste de esa retroalimentación?" },
-            { main: "Cuéntame sobre un reto o conflicto que enfrentaste en la escuela. ¿Cómo lo resolviste?", followUp: "¿Lo manejarías de manera diferente ahora?" },
-            { main: "Cuéntame sobre una ocasión en la que pediste ayuda o tuviste que negociar algo con un compañero, maestro o adulto.", followUp: "¿Cómo abordaste la conversación?" },
-            { main: "Cuéntame sobre una ocasión en la que cometiste un error en la escuela o con amigos. ¿Qué hiciste?", followUp: "¿Lo manejarías de la misma manera otra vez?" },
-            { main: "¿Qué te interesa de trabajar en Chick-fil-A? ¿Qué esperas aprender o lograr este año?", followUp: "¿Cómo te mantendrás motivado si el trabajo se vuelve repetitivo?" }
-        ],
-        yes: [
-            { main: "Cuéntame sobre tu experiencia en servicio al cliente u hospitalidad. ¿Cuál fue tu rol?", followUp: "Describe una interacción difícil con un cliente que hayas manejado." },
-            { main: "Describe una ocasión en la que trabajaste como parte de un equipo para lograr una meta. ¿Cuál fue tu contribución?", followUp: "¿Cómo manejaste los conflictos o desacuerdos con los miembros del equipo?" },
-            { main: "¿Cómo has manejado el control de calidad o el seguimiento de procedimientos en tu trabajo anterior?", followUp: "Cuéntame sobre una ocasión en la que detectaste o evitaste un error o un problema de calidad." },
-            { main: "Cuéntame sobre una ocasión en la que tuviste que mantener la calma y rendir bien bajo presión. ¿Cuál fue la situación?", followUp: "¿Cómo manejaste la presión? ¿Qué harías diferente?" },
-            { main: "Cuéntame sobre una ocasión en la que cometiste un error en el trabajo. ¿Cómo lo manejaste?", followUp: "¿Cómo manejarías una situación similar si volviera a ocurrir?" },
-            { main: "Describe una ocasión en la que tuviste que seguir un procedimiento o sistema que no conocías. ¿Cómo lo aprendiste?", followUp: "¿Alguna vez has sugerido una mejora a un proceso o sistema? Cuéntame sobre ello." },
-            { main: "¿Por qué quieres trabajar en Chick-fil-A? ¿Qué habilidades o cualidades has desarrollado que te ayudarán a tener éxito aquí?", followUp: "¿Qué habilidad te gustaría desarrollar o mejorar en el próximo año?" }
+        foh: {
+            no: [
+                { main: "Cuéntame sobre una ocasión en la que trabajaste en un proyecto en grupo o en un equipo en la escuela o en una actividad extracurricular. ¿Cuál fue tu rol?", followUp: "¿Cómo manejaste los desacuerdos o las ideas diferentes dentro de tu equipo?" },
+                { main: "Describe una ocasión en la que un maestro, entrenador o padre te dio retroalimentación o te corrigió. ¿Cómo respondiste?", followUp: "¿Qué aprendiste de esa retroalimentación?" },
+                { main: "Cuéntame sobre un reto o conflicto que enfrentaste en la escuela. ¿Cómo lo resolviste?", followUp: "¿Lo manejarías de manera diferente ahora?" },
+                { main: "Cuéntame sobre una ocasión en la que pediste ayuda o tuviste que negociar algo con un compañero, maestro o adulto.", followUp: "¿Cómo abordaste la conversación?" },
+                { main: "Cuéntame sobre una ocasión en la que cometiste un error en la escuela o con amigos. ¿Qué hiciste?", followUp: "¿Lo manejarías de la misma manera otra vez?" },
+                { main: "¿Qué te interesa de trabajar en Chick-fil-A? ¿Qué esperas aprender o lograr este año?", followUp: "¿Cómo te mantendrás motivado si el trabajo se vuelve repetitivo?" }
+            ],
+            yes: [
+                { main: "Cuéntame sobre tu experiencia en servicio al cliente u hospitalidad. ¿Cuál fue tu rol?", followUp: "Describe una interacción difícil con un cliente que hayas manejado." },
+                { main: "Describe una ocasión en la que trabajaste como parte de un equipo para lograr una meta. ¿Cuál fue tu contribución?", followUp: "¿Cómo manejaste los conflictos o desacuerdos con los miembros del equipo?" },
+                { main: "¿Cómo has manejado el control de calidad o el seguimiento de procedimientos en tu trabajo anterior?", followUp: "Cuéntame sobre una ocasión en la que detectaste o evitaste un error o un problema de calidad." },
+                { main: "Cuéntame sobre una ocasión en la que tuviste que mantener la calma y rendir bien bajo presión. ¿Cuál fue la situación?", followUp: "¿Cómo manejaste la presión? ¿Qué harías diferente?" },
+                { main: "Cuéntame sobre una ocasión en la que cometiste un error en el trabajo. ¿Cómo lo manejaste?", followUp: "¿Cómo manejarías una situación similar si volviera a ocurrir?" },
+                { main: "Describe una ocasión en la que tuviste que seguir un procedimiento o sistema que no conocías. ¿Cómo lo aprendiste?", followUp: "¿Alguna vez has sugerido una mejora a un proceso o sistema? Cuéntame sobre ello." },
+                { main: "¿Por qué quieres trabajar en Chick-fil-A? ¿Qué habilidades o cualidades has desarrollado que te ayudarán a tener éxito aquí?", followUp: "¿Qué habilidad te gustaría desarrollar o mejorar en el próximo año?" }
+            ]
+        },
+        boh: {
+            no: [
+                { main: "Cuéntame sobre una ocasión en la que trabajaste en un proyecto en grupo o en un equipo en la escuela o en una actividad extracurricular. ¿Cuál fue tu rol?", followUp: "¿Cómo manejaste los desacuerdos o las ideas diferentes dentro de tu equipo?" },
+                { main: "Describe una ocasión en la que un maestro, entrenador o padre te dio retroalimentación o te corrigió. ¿Cómo respondiste?", followUp: "¿Qué aprendiste de esa retroalimentación?" },
+                { main: "Cuéntame sobre un reto o conflicto que enfrentaste en la escuela. ¿Cómo lo resolviste?", followUp: "¿Lo manejarías de manera diferente ahora?" },
+                { main: "El trabajo en la cocina significa hacer la misma tarea con cuidado muchas veces - empanizar el pollo exactamente igual en la pieza número cien que en la primera. Cuéntame sobre una ocasión en la que tuviste que hacer algo repetitivo y aun así hacerlo bien.", followUp: "¿Cómo evitaste descuidarte o aburrirte?" },
+                { main: "Cuéntame sobre una ocasión en la que cometiste un error en la escuela o con amigos. ¿Qué hiciste?", followUp: "¿Lo manejarías de la misma manera otra vez?" },
+                { main: "¿Qué te interesa de trabajar en Chick-fil-A? ¿Qué esperas aprender o lograr este año?", followUp: "¿Cómo te mantendrás motivado si el trabajo se vuelve repetitivo?" }
+            ],
+            yes: [
+                { main: "En Chick-fil-A nos enorgullece mucho la limpieza de nuestras cocinas y la seguridad de nuestros alimentos. ¿Qué tan importante es la limpieza para ti y por qué?", followUp: "Cuéntame sobre una ocasión en la que notaste algo que no estaba limpio o no estaba bien. ¿Qué hiciste al respecto?" },
+                { main: "Describe una ocasión en la que trabajaste como parte de un equipo para lograr una meta. ¿Cuál fue tu contribución?", followUp: "¿Cómo manejaste los conflictos o desacuerdos con los miembros del equipo?" },
+                { main: "¿Cómo has manejado el control de calidad o el seguimiento de procedimientos en tu trabajo anterior?", followUp: "Cuéntame sobre una ocasión en la que detectaste o evitaste un error o un problema de calidad." },
+                { main: "El trabajo en la cocina significa estar de pie por largos períodos en un lugar caluroso, ruidoso y de ritmo rápido. Cuéntame sobre una ocasión en la que tuviste que seguir trabajando duro en condiciones difíciles o incómodas.", followUp: "¿Cómo mantuviste la concentración? ¿Qué te ayudó a seguir adelante?" },
+                { main: "Cuéntame sobre una ocasión en la que cometiste un error en el trabajo. ¿Cómo lo manejaste?", followUp: "¿Cómo manejarías una situación similar si volviera a ocurrir?" },
+                { main: "Describe una ocasión en la que tuviste que seguir un procedimiento o sistema que no conocías. ¿Cómo lo aprendiste?", followUp: "¿Alguna vez has sugerido una mejora a un proceso o sistema? Cuéntame sobre ello." },
+                { main: "¿Por qué quieres trabajar en Chick-fil-A? ¿Qué habilidades o cualidades has desarrollado que te ayudarán a tener éxito aquí?", followUp: "¿Qué habilidad te gustaría desarrollar o mejorar en el próximo año?" }
+            ]
+        },
+        driver: {
+            no: [
+                { main: "Cuéntame sobre una ocasión en la que trabajaste en un proyecto en grupo o en un equipo en la escuela o en una actividad extracurricular. ¿Cuál fue tu rol?", followUp: "¿Cómo manejaste los desacuerdos o las ideas diferentes dentro de tu equipo?" },
+                { main: "Describe una ocasión en la que un maestro, entrenador o padre te dio retroalimentación o te corrigió. ¿Cómo respondiste?", followUp: "¿Qué aprendiste de esa retroalimentación?" },
+                { main: "Cuéntame sobre un reto o conflicto que enfrentaste en la escuela. ¿Cómo lo resolviste?", followUp: "¿Lo manejarías de manera diferente ahora?" },
+                { main: "Cuéntame sobre una ocasión en la que ibas retrasado o bajo presión de tiempo mientras conducías. ¿Qué hiciste?", followUp: "¿Cómo equilibras llegar a tiempo con conducir de forma segura?" },
+                { main: "Cuéntame sobre una ocasión en la que cometiste un error en la escuela o con amigos. ¿Qué hiciste?", followUp: "¿Lo manejarías de la misma manera otra vez?" },
+                { main: "¿Qué te interesa de trabajar en Chick-fil-A? ¿Qué esperas aprender o lograr este año?", followUp: "¿Cómo te mantendrás motivado si el trabajo se vuelve repetitivo?" }
+            ],
+            yes: [
+                { main: "Cuéntame sobre tu experiencia en servicio al cliente u hospitalidad. ¿Cuál fue tu rol?", followUp: "Describe una interacción difícil con un cliente que hayas manejado." },
+                { main: "Describe una ocasión en la que trabajaste como parte de un equipo para lograr una meta. ¿Cuál fue tu contribución?", followUp: "¿Cómo manejaste los conflictos o desacuerdos con los miembros del equipo?" },
+                { main: "Entregar comida significa llevar el pedido correcto y mantenerlo a la temperatura adecuada desde la cocina hasta la puerta del cliente. Cuéntame sobre una ocasión en la que fuiste responsable de hacer algo con exactitud.", followUp: "¿Qué hiciste para verificar tu trabajo?" },
+                { main: "Cuéntame sobre una ocasión en la que ibas retrasado o bajo presión de tiempo mientras conducías. ¿Qué hiciste?", followUp: "¿Cómo equilibras llegar a tiempo con conducir de forma segura?" },
+                { main: "Cuéntame sobre una ocasión en la que cometiste un error en el trabajo. ¿Cómo lo manejaste?", followUp: "¿Cómo manejarías una situación similar si volviera a ocurrir?" },
+                { main: "Describe una ocasión en la que tuviste que seguir un procedimiento o sistema que no conocías. ¿Cómo lo aprendiste?", followUp: "¿Alguna vez has sugerido una mejora a un proceso o sistema? Cuéntame sobre ello." },
+                { main: "¿Por qué quieres trabajar en Chick-fil-A? ¿Qué habilidades o cualidades has desarrollado que te ayudarán a tener éxito aquí?", followUp: "¿Qué habilidad te gustaría desarrollar o mejorar en el próximo año?" }
+            ]
+        },
+        lead: [
+            { main: "¿Cuál es la diferencia entre un líder y un gerente? ¿Cuál eres tú?", followUp: "Dame un ejemplo de una ocasión en la que fuiste uno y no el otro." },
+            { main: "Describe tu estilo de liderazgo.", followUp: "Cuéntame sobre alguien a quien dirigiste que no respondió bien a ese estilo. ¿Qué hiciste?" },
+            { main: "Cuéntame sobre una ocasión en la que fracasaste en algo importante.", followUp: "¿Qué cambiaste después?" },
+            { main: "Cuéntame sobre una ocasión en la que tuviste que dirigir un equipo. ¿Cuál fue tu mayor factor de éxito?", followUp: "¿Qué harías diferente la próxima vez?" },
+            { main: "Cuéntame sobre tu experiencia entrenando y capacitando a otros.", followUp: "¿Cómo sabes cuando alguien realmente lo ha aprendido?" },
+            { main: "¿Qué harías si sorprendieras a un compañero de trabajo robando?", followUp: "¿Alguna vez has tenido que reportar a alguien? ¿Qué pasó?" },
+            { main: "¿Dónde quieres que esté tu carrera en dos o tres años?", followUp: "¿Qué estás haciendo ahora para lograrlo?" }
         ]
     }
+};
+
+// Extra bonus questions shown only for Driver applicants.
+const driverBonus = {
+    en: [
+        { type: 'text', q: "Do you have a valid driver's license? What state is it issued in?" },
+        { type: 'text', q: 'Do you have current auto insurance?' },
+        { type: 'text', q: 'Have you had any moving violations, accidents, or license suspensions in the last three years? If so, please describe.' },
+        { type: 'text', q: 'How familiar are you with the Reston and Herndon area?' }
+    ],
+    es: [
+        { type: 'text', q: '¿Tienes una licencia de conducir vigente? ¿En qué estado fue emitida?' },
+        { type: 'text', q: '¿Tienes seguro de auto vigente?' },
+        { type: 'text', q: '¿Has tenido infracciones de tránsito, accidentes o suspensiones de licencia en los últimos tres años? Si es así, por favor descríbelo.' },
+        { type: 'text', q: '¿Qué tan bien conoces el área de Reston y Herndon?' }
+    ]
 };
 
 // Day keys stay in English so red-flag logic and the admin email are unchanged.
@@ -258,6 +385,7 @@ const bonusQuestions = {
 let lang = 'en';
 let candidateName = '';
 let currentPath = null;
+let currentRole = null;
 let currentIndex = 0;
 let currentBonusIndex = 0;
 let scores = [];
@@ -266,8 +394,8 @@ let bonusAnswers = [];
 let finalScore = 0;
 
 const t = (key) => UI[lang][key];
-const Q = () => questions[lang][currentPath];
-const BQ = () => bonusQuestions[lang];
+const Q = () => currentRole === 'lead' ? questions[lang].lead : questions[lang][currentRole][currentPath];
+const BQ = () => currentRole === 'driver' ? bonusQuestions[lang].concat(driverBonus[lang]) : bonusQuestions[lang];
 
 function getUrlParam(name) {
     const params = new URLSearchParams(window.location.search);
@@ -299,7 +427,19 @@ function startInterview() {
     const name = document.getElementById('candidateName').value.trim();
     if (!name) { alert(t('alertName')); return; }
     candidateName = name;
-    showScreen('routingScreen');
+    if (currentRole) { beginPath(); return; }
+    showScreen('roleScreen');
+}
+
+// Leadership skips the experience routing question entirely.
+function selectRole(role) {
+    currentRole = role;
+    beginPath();
+}
+
+function beginPath() {
+    if (currentRole === 'lead') { selectPath('lead'); }
+    else { showScreen('routingScreen'); }
 }
 
 function selectPath(path) {
@@ -370,7 +510,7 @@ async function scoreInterview() {
         const response = await fetch('/api/score-interview', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: currentPath, answers, language: lang })
+            body: JSON.stringify({ path: currentPath, role: currentRole, answers, language: lang })
         });
         if (!response.ok) throw new Error('Scoring API returned ' + response.status);
         const data = await response.json();
@@ -463,6 +603,7 @@ async function sendResults() {
                 bonusAnswers,
                 flags,
                 path: currentPath,
+                role: currentRole,
                 language: lang              // backend translates Spanish answers to English
             })
         });
@@ -486,6 +627,30 @@ function detectRedFlags() {
         // whole-word "no" / "don't" in English, "no tengo" / "no cuento" in Spanish
         if (/\bno\b/.test(a) || /\bdon'?t\b/.test(a) || /\bno tengo\b/.test(a) || /\bno cuento\b/.test(a)) {
             flags.push({ category: 'Transportation', text: 'No personal transportation' });
+        }
+    }
+    // Driver-only flags. B11 (violations) has inverted polarity: "none" is the good answer.
+    if (currentRole === 'driver') {
+        if (bonusAnswers[8]) {
+            const a = bonusAnswers[8].toLowerCase();
+            if (/\b(no|don'?t|expired|suspended|revoked|permit)\b/.test(a) && !/\bno (problem|issue)/.test(a)) {
+                flags.push({ category: 'Driver License', text: 'No valid license, or license expired/suspended' });
+            }
+        }
+        if (bonusAnswers[9]) {
+            const a = bonusAnswers[9].toLowerCase();
+            if (/\b(no|don'?t|none|lapsed|expired)\b/.test(a) && !/\bno (problem|issue)/.test(a)) {
+                flags.push({ category: 'Auto Insurance', text: 'No current auto insurance' });
+            }
+        }
+        if (bonusAnswers[10]) {
+            const a = bonusAnswers[10].toLowerCase().trim();
+            const clean = /^(no|none|nope|n\/a|zero|0|clean|ninguna|ninguno|nada)\b/.test(a)
+                || /\b(no violations|no accidents|no tickets|clean record|sin infracciones|sin accidentes|ningun)/.test(a);
+            const hasIssue = /(dui|dwi|accident|ticket|violation|suspend|revok|reckless|speeding|crash|infracci|accidente|multa)/.test(a);
+            if (!clean && hasIssue) {
+                flags.push({ category: 'Driving Record', text: 'Reported violations, accidents, or suspensions' });
+            }
         }
     }
     if (bonusAnswers[5]) {
@@ -561,6 +726,8 @@ function showScreen(screenId) {
 window.addEventListener('load', () => {
     const name = getUrlParam('name');
     if (name) document.getElementById('candidateName').value = name;
+    const r = (getUrlParam('role') || '').toLowerCase();
+    if (r === 'foh' || r === 'boh' || r === 'lead' || r === 'driver') currentRole = r;
     const l = getUrlParam('lang');
     if (l === 'es' || l === 'en') lang = l;
     applyLanguage();
