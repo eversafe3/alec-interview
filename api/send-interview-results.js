@@ -80,7 +80,7 @@ module.exports = async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    let { candidateName, finalScore, tier, scores, answers, bonusAnswers, flags, path, language } = req.body || {};
+    let { candidateName, finalScore, tier, scores, answers, bonusAnswers, flags, path, role, language } = req.body || {};
 
     if (!candidateName || finalScore === undefined) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -95,11 +95,13 @@ module.exports = async function handler(req, res) {
             bonusAnswers = await translateBonusAnswers(bonusAnswers || []);
         }
 
-        const pathLabel = path === 'yes' ? 'Work Experience' : 'No Experience';
+        const roleLabel = role === 'boh' ? 'BACK OF HOUSE' : role === 'lead' ? 'LEADERSHIP' : role === 'driver' ? 'DRIVER' : 'FRONT OF HOUSE';
+        const pathLabel = path === 'lead' ? 'Leadership Track' : path === 'yes' ? 'Work Experience' : 'No Experience';
         const questionsCount = (answers || []).length;
 
         let emailBody = '<h2>Alec Interview Results</h2>'
             + '<p><strong>Candidate:</strong> ' + candidateName + '</p>'
+            + '<p><strong>Position:</strong> ' + roleLabel + '</p>'
             + '<p><strong>Path:</strong> ' + pathLabel + '</p>'
             + '<p><strong>Final Score:</strong> <span style="font-size: 24px; color: #d21e1e; font-weight: bold;">' + finalScore.toFixed(1) + '</span> (' + tier + ')</p>'
             + '<hr />';
@@ -144,6 +146,14 @@ module.exports = async function handler(req, res) {
             { q: 'Knows Someone at CFA', type: 'text' },
             { q: 'Attendance & Reliability', type: 'text' }
         ];
+        if (role === 'driver') {
+            bonusQuestions.push(
+                { q: "Driver's License", type: 'text' },
+                { q: 'Auto Insurance', type: 'text' },
+                { q: 'Violations / Accidents (last 3 yrs)', type: 'text' },
+                { q: 'Area Familiarity (Reston/Herndon)', type: 'text' }
+            );
+        }
 
         const hasBonus = bonusAnswers && bonusAnswers.length > 0 && bonusAnswers.some(function(a) { return a; });
         if (hasBonus) {
@@ -176,7 +186,7 @@ module.exports = async function handler(req, res) {
             body: JSON.stringify({
                 from: 'Alec Interview <onboarding@resend.dev>',
                 to: [RESULTS_EMAIL],
-                subject: 'Alec Interview Complete: ' + candidateName + ' (' + finalScore.toFixed(1) + ' - ' + tier + ')',
+                subject: '[' + roleLabel + '] Alec Interview: ' + candidateName + ' (' + finalScore.toFixed(1) + ' - ' + tier + ')',
                 html: emailBody
             })
         });
