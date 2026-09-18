@@ -7,9 +7,9 @@ module.exports = async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { path, answers, language } = req.body || {};
+    const { path, role, answers, language } = req.body || {};
 
-    if (!Array.isArray(answers) || answers.length === 0 || (path !== 'yes' && path !== 'no')) {
+    if (!Array.isArray(answers) || answers.length === 0 || (path !== 'yes' && path !== 'no' && path !== 'lead')) {
         return res.status(400).json({ error: 'Missing or invalid fields' });
     }
 
@@ -18,6 +18,13 @@ module.exports = async function handler(req, res) {
     }
 
     const count = answers.length;
+    const roleLabel = role === 'boh' ? 'Back of House (kitchen / food preparation)'
+        : role === 'lead' ? 'Leadership (Team Leader / Manager)'
+        : role === 'driver' ? 'Delivery Driver'
+        : 'Front of House (counter / drive-thru / dining room)';
+    const pathLabel = path === 'lead' ? 'Leadership candidate (experienced)'
+        : path === 'yes' ? 'Previous Work Experience'
+        : 'First Job / High School Student';
     const langNote = language === 'es'
         ? 'The candidate answered in Spanish. Do not penalize language choice.'
         : 'The candidate answered in English.';
@@ -27,14 +34,17 @@ module.exports = async function handler(req, res) {
     }).join('\n\n');
 
     const prompt = 'You are a hiring manager screening candidates for entry-level hourly positions at Chick-fil-A. Score each response 1-9.\n\n'
-        + 'IMPORTANT CONTEXT: Many candidates are teenagers or first-time job seekers typing on a phone. Score for POTENTIAL and ATTITUDE, not polish. Be generous and give the benefit of the doubt.\n\n'
+        + (role === 'lead'
+            ? 'IMPORTANT CONTEXT: This is a LEADERSHIP candidate. Hold them to a higher standard than an entry-level applicant. Expect concrete examples of leading people, owning failure, and developing others. Vague or purely theoretical answers should not score above 6.\n\n'
+            : 'IMPORTANT CONTEXT: Many candidates are teenagers or first-time job seekers typing on a phone. Score for POTENTIAL and ATTITUDE, not polish. Be generous and give the benefit of the doubt.\n\n')
         + 'Scoring guide:\n'
         + '1-3: C Candidate. Reserve this range for genuinely concerning answers only: blank or nonsense responses, hostility, dishonesty, or clear red flags about work ethic or character. An answer that is merely short or unimpressive is NOT a 1-3.\n'
         + '4-6: B Candidate. The default range. Any reasonable, on-topic answer showing willingness to work, basic teamwork, and a positive attitude belongs here.\n'
         + '7-9: A Candidate. A specific example, evidence of reflection or learning, ownership of a mistake, or genuine enthusiasm for service. One good concrete detail is enough to earn a 7.\n\n'
         + 'Do NOT deduct points for: brief answers, simple vocabulary, spelling or grammar errors, typos, limited work history, or youth. These are expected and are not job-relevant.\n'
         + 'When an answer could reasonably fall into two ranges, choose the HIGHER score.\n\n'
-        + 'Candidate Path: ' + (path === 'yes' ? 'Previous Work Experience' : 'First Job / High School Student') + '\n'
+        + 'Position applied for: ' + roleLabel + '\n'
+        + 'Candidate Path: ' + pathLabel + '\n'
         + langNote + '\n\n'
         + 'Responses:\n' + allAnswers + '\n\n'
         + 'Return ONLY a JSON array of exactly ' + count + ' integer scores in order. Example: [7,8,6,7]. No other text.';
